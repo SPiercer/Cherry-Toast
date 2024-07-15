@@ -216,14 +216,14 @@ class CherryToast extends StatefulWidget {
 
   ///Text widget displayed as a title in the toast
   ///required parameter for all toast types
-  final Text? title;
+  final Widget? title;
 
   ///Text widget displayed as a description in the toast
-  final Text? description;
+  final Widget? description;
 
   ///THe action button displayed below description
   ///by default there's no action added
-  final Text? action;
+  final Widget? action;
 
   ///the toast icon, it's required when using the default constructor
   ///
@@ -261,7 +261,7 @@ class CherryToast extends StatefulWidget {
 
   ///the function invoked when clicking on the action button
   ///
-  final Function? actionHandler;
+  final void Function()? actionHandler;
 
   ///The duration of the animation by default it's 1.5 seconds
   ///
@@ -566,9 +566,7 @@ class _CherryToastState extends State<CherryToast>
                           iconSize: widget.iconSize,
                           iconColor: widget.iconColor,
                           enableAnimation: widget.enableIconAnimation,
-                        )
-                      else
-                        Container(),
+                        ),
                       renderToastContent(),
                     ],
                   ),
@@ -630,29 +628,17 @@ class _CherryToastState extends State<CherryToast>
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               if (widget.title != null) widget.title!,
-              if (widget.description != null)
-                Column(
-                  children: [
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    widget.description!,
-                  ],
+              if (widget.description != null) ...[
+                const SizedBox(height: 5),
+                widget.description!,
+              ],
+              if (widget.action != null) ...[
+                const SizedBox(height: 5),
+                InkWell(
+                  onTap: widget.actionHandler,
+                  child: widget.action,
                 ),
-              if (widget.action != null)
-                Column(
-                  children: [
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        widget.actionHandler?.call();
-                      },
-                      child: widget.action,
-                    ),
-                  ],
-                ),
+              ],
             ],
           ),
         ),
