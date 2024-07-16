@@ -522,68 +522,86 @@ class _CherryToastState extends State<CherryToast>
   ///render a left layout toast if [this.widget.layout] set to LTR
   ///
   Widget renderCherryToastContent(BuildContext context) {
-    return Wrap(
-      children: [
-        Container(
-          decoration: widget.inheritThemeColors
-              ? toastDecoration.copyWith(
-                  color: Theme.of(context).colorScheme.surface,
-                  boxShadow: [
-                    _createToastBoxShadow(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacity(0.12),
-                    ),
-                  ],
-                )
-              : toastDecoration,
-          constraints: widget.constraints,
-          width: widget.width,
-          height: widget.height,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Row(
-                    crossAxisAlignment:
-                        widget.description == null && widget.action == null
-                            ? CrossAxisAlignment.center
-                            : CrossAxisAlignment.start,
-                    children: [
-                      //TODO refactor `iconWidget` and `titleWidget` to avoid duplication
-                      if (widget.iconWidget != null)
-                        widget.iconWidget!
-                      else if (widget.displayIcon)
-                        CherryToastIcon(
-                          color: widget.themeColor,
-                          icon: widget.icon,
-                          iconSize: widget.iconSize,
-                          iconColor: widget.iconColor,
-                          enableAnimation: widget.enableIconAnimation,
-                        ),
-                      renderToastContent(),
+    return InkWell(
+      onTap: () {
+        // dismiss the toast and invoke the callback
+        if (!widget.disableToastAnimation) {
+          slideController.reverse();
+        }
+        autoDismissTimer?.cancel();
+        Timer(
+          widget.animationDuration,
+          () {
+            widget.closeOverlay();
+          },
+        );
+
+        // invoke the action handler
+        widget.actionHandler?.call();
+      },
+      child: Wrap(
+        children: [
+          Container(
+            decoration: widget.inheritThemeColors
+                ? toastDecoration.copyWith(
+                    color: Theme.of(context).colorScheme.surface,
+                    boxShadow: [
+                      _createToastBoxShadow(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.12),
+                      ),
                     ],
-                  ),
-                ),
-                if (widget.displayCloseButton)
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      top: 10,
-                      right: 10,
+                  )
+                : toastDecoration,
+            constraints: widget.constraints,
+            width: widget.width,
+            height: widget.height,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Row(
+                      crossAxisAlignment:
+                          widget.description == null && widget.action == null
+                              ? CrossAxisAlignment.center
+                              : CrossAxisAlignment.start,
+                      children: [
+                        //TODO refactor `iconWidget` and `titleWidget` to avoid duplication
+                        if (widget.iconWidget != null)
+                          widget.iconWidget!
+                        else if (widget.displayIcon)
+                          CherryToastIcon(
+                            color: widget.themeColor,
+                            icon: widget.icon,
+                            iconSize: widget.iconSize,
+                            iconColor: widget.iconColor,
+                            enableAnimation: widget.enableIconAnimation,
+                          ),
+                        renderToastContent(),
+                      ],
                     ),
-                    child: renderCloseButton(context),
                   ),
-              ],
+                  if (widget.displayCloseButton)
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 10,
+                        right: 10,
+                      ),
+                      child: renderCloseButton(context),
+                    ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
